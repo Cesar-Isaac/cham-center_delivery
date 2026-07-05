@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracking_provider/features_user/cart/presentation/pages/cart.dart';
 
 import '../../features-provider/driver/presentation/screens/main/driver_main_screen.dart';
 import '../../features-provider/driver/presentation/screens/trip/trip_screen.dart';
@@ -17,7 +18,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const TripScreen());
       case HistoryScreen.route:
         return MaterialPageRoute(builder: (_) => const HistoryScreen());
-      default:
+        ///////////////// user Pages
+        case Cart.route:
+        return MaterialPageRoute(builder: (_) => const Cart());
+        default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }
   }
