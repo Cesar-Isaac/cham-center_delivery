@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 
+import '../../../../core/style/widgets/custom_bottom.dart';
 import '../manager/cart_cubit.dart';
 import '../manager/cart_state.dart';
 import '../widgets/cart_card.dart';
@@ -74,7 +75,9 @@ class Cart extends StatelessWidget {
                     ),
                   ],
                 ),
-              )
+              ),
+
+              CustomButton(text: 'Pay', onPressed: () {  },),
             ],
           );
         },
