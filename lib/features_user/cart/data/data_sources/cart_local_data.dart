@@ -8,6 +8,24 @@ class CartLocalDataSource {
   }
 
   void addProduct(CartEntity item) {
+    if (_cartItems.isNotEmpty) {
+      final hasFood = _cartItems.any(
+            (e) => e.product.category == "food",
+      );
+
+      final isFood = item.product.category == "food";
+
+      // السلة فيها طعام والمنتج ليس طعاماً
+      if (hasFood && !isFood) {
+        throw Exception("لا يمكن إضافة منتجات غير الطعام إلى سلة تحتوي على طعام.");
+      }
+
+      // السلة فيها منتجات أخرى والمنتج طعام
+      if (!hasFood && isFood) {
+        throw Exception("لا يمكن إضافة الطعام إلى سلة تحتوي على منتجات أخرى.");
+      }
+    }
+
     final index = _cartItems.indexWhere(
           (e) => e.product.id == item.product.id,
     );
