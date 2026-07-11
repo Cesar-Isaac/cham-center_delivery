@@ -17,6 +17,10 @@ import '../../features_user/cart/domain/usecases/delete_product.dart';
 import '../../features_user/cart/domain/usecases/get_cart.dart';
 import '../../features_user/cart/domain/usecases/increase_quantity.dart';
 import '../../features_user/cart/presentation/manager/cart_cubit.dart';
+import '../../features_user/payment/data/data_sources/payment_remote_data_source.dart';
+import '../../features_user/payment/data/repositories_impl/payment_repository_impl.dart';
+import '../../features_user/payment/domain/usecases/payment_usecase.dart';
+import '../../features_user/payment/presentation/manager/payment_cubit.dart';
 
 class Locator {
   Locator({required SharedPreferences prefs})
@@ -68,6 +72,32 @@ class Locator {
     decreaseQuantityUseCase: decreaseQuantityUseCase,
     clearCartUseCase: clearCartUseCase,
   )..loadCart();
+
+  //////////////////// Payment
+
+
+  final PaymentRemoteDataSource paymentRemoteDataSource =
+  PaymentRemoteDataSourceImpl();
+
+
+
+  late final PaymentRepositoryImpl paymentRepository =
+  PaymentRepositoryImpl(
+    paymentRemoteDataSource,
+  );
+
+
+
+  late final InitializePaymentUseCase initializePaymentUseCase =
+  InitializePaymentUseCase(
+    paymentRepository,
+  );
+
+
+  late final PaymentCubit paymentCubit =
+  PaymentCubit(
+    initializePaymentUseCase,
+  );
 
 }
 
