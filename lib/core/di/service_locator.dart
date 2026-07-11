@@ -17,6 +17,7 @@ import '../../features_user/cart/domain/usecases/delete_product.dart';
 import '../../features_user/cart/domain/usecases/get_cart.dart';
 import '../../features_user/cart/domain/usecases/increase_quantity.dart';
 import '../../features_user/cart/presentation/manager/cart_cubit.dart';
+import '../../features_user/role/presentation/manager/role_cubit.dart';
 
 class Locator {
   Locator({required SharedPreferences prefs})
@@ -26,6 +27,8 @@ class Locator {
   final OrderRepository orders = OrderSimulationRepository();
   final TripRepository trips = TripSimulationRepository();
   final HistoryRepository history;
+
+
 
   ////////////////////cart
   final CartLocalDataSource cartLocalDataSource =
