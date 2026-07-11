@@ -43,6 +43,7 @@ dependencies:
   http: ^1.2.2
   shared_preferences: 2.2.3
   connectivity_plus: ^6.1.4
+  moyasar: ^2.1.0
 
 dependency_overrides:
   # Pin to pre-Pigeon version to avoid channel-error on Android.
