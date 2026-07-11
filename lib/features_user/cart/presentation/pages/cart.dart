@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-
 import '../../../../core/style/widgets/custom_bottom.dart';
+import '../../../payment/presentation/pages/Payment_options.dart';
+import '../../../payment/presentation/pages/payment_page.dart';
 import '../manager/cart_cubit.dart';
 import '../manager/cart_state.dart';
 import '../widgets/cart_card.dart';
@@ -19,7 +19,13 @@ class Cart extends StatelessWidget {
         title: const Text("Cart"),
         actions: [
           IconButton(
-            onPressed: cubit.clearCart,
+           // onPressed: cubit.clearCart,
+            onPressed: (){
+              Navigator.pushNamed(
+                context,
+                PaymentOptions.route,
+              );
+            },
             icon: const Icon(Icons.delete_forever),
           )
         ],
