@@ -5,7 +5,7 @@ class DecreaseQuantityUseCase {
 
   DecreaseQuantityUseCase(this.repository);
 
-  void call(int productId) {
-    repository.decreaseQuantity(productId);
+  Future<void> call(int productId) async {
+    await repository.decreaseQuantity(productId);
   }
 }

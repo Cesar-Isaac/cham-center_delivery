@@ -14,29 +14,32 @@ class CartRepositoryImpl implements CartRepository {
   }
 
   @override
-  void addProduct(ProductEntity product) {
-    localDataSource.addProduct(
-      CartEntity(product: product, quantity: 1),
+  Future<void> addProduct(ProductEntity product) async {
+    final item = CartEntity(
+      product: product,
+      quantity: 1,
     );
+
+    await localDataSource.addProduct(item);
   }
 
   @override
-  void deleteProduct(int productId) {
-    localDataSource.deleteProduct(productId);
+  Future<void> deleteProduct(int productId) async {
+    await localDataSource.deleteProduct(productId);
   }
 
   @override
-  void increaseQuantity(int productId) {
-    localDataSource.increaseQuantity(productId);
+  Future<void> increaseQuantity(int productId) async {
+    await localDataSource.increaseQuantity(productId);
   }
 
   @override
-  void decreaseQuantity(int productId) {
-    localDataSource.decreaseQuantity(productId);
+  Future<void> decreaseQuantity(int productId) async {
+    await localDataSource.decreaseQuantity(productId);
   }
 
   @override
-  void clearCart() {
-    localDataSource.clearCart();
+  Future<void> clearCart() async {
+    await localDataSource.clearCart();
   }
 }

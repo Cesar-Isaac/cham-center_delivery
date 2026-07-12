@@ -3,9 +3,9 @@ import '../../domain/entities/cart_entity.dart';
 
 class CartCard extends StatelessWidget {
   final CartEntity item;
-  final VoidCallback onIncrease;
-  final VoidCallback onDecrease;
-  final VoidCallback onDelete;
+  final VoidCallback? onIncrease;
+  final VoidCallback? onDecrease;
+  final VoidCallback? onDelete;
 
   const CartCard({
     super.key,
