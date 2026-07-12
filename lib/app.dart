@@ -13,7 +13,7 @@ class App extends StatelessWidget {
       title: 'Tracking Provider',
       theme: AppTheme.dark,
       onGenerateRoute: AppRouter.onGenerateRoute,
-      initialRoute: '/cart',
+      initialRoute: '/user-orders',
     );
   }
 }
