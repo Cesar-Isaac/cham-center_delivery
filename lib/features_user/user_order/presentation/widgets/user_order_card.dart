@@ -7,10 +7,12 @@ import 'order_status_chip.dart';
 
 class UserOrderCard extends StatelessWidget {
   final OrderEntity order;
+  final VoidCallback? onTrack;
 
   const UserOrderCard({
     super.key,
     required this.order,
+    this.onTrack,
   });
 
   @override
@@ -65,27 +67,32 @@ class UserOrderCard extends StatelessWidget {
           const SizedBox(height: 8),
 
           ...order.products.map(
-                (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      item.product.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                (item) {
+              return Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 10,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.product.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                  Text(
-                    '${item.quantity} × '
-                        '${item.product.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(width: 12),
+                    Text(
+                      '${item.quantity} × '
+                          '${item.product.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
+                  ],
+                ),
+              );
+            },
           ),
 
           const Divider(),
@@ -108,6 +115,12 @@ class UserOrderCard extends StatelessWidget {
             icon: Icons.person_outline,
             label: 'المستخدم',
             value: order.user.name,
+          ),
+
+          OrderInformationRow(
+            icon: Icons.phone_outlined,
+            label: 'هاتف المستخدم',
+            value: order.user.phone,
           ),
 
           const Divider(),
@@ -157,12 +170,68 @@ class UserOrderCard extends StatelessWidget {
             label: 'التاريخ',
             value: _formatDate(order.createdAt),
           ),
+
+          const SizedBox(height: 16),
+
+          _buildTrackingSection(),
         ],
       ),
     );
   }
 
-  String _paymentMethodLabel(PaymentMethod method) {
+  Widget _buildTrackingSection() {
+    switch (order.status) {
+      case OrderStatus.pending:
+        return const _OrderMessage(
+          icon: Icons.schedule,
+          message:
+          'سيبدأ التوصيل خلال لحظات.',
+          color: Colors.orange,
+        );
+
+      case OrderStatus.preparing:
+        return const _OrderMessage(
+          icon: Icons.inventory_2_outlined,
+          message:
+          'يتم الآن تجهيز طلبك.',
+          color: Colors.blue,
+        );
+
+      case OrderStatus.delivering:
+        return SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: onTrack,
+            icon: const Icon(
+              Icons.map_outlined,
+            ),
+            label: const Text(
+              'تتبع الطلب على الخريطة',
+            ),
+          ),
+        );
+
+      case OrderStatus.completed:
+        return const _OrderMessage(
+          icon: Icons.check_circle_outline,
+          message:
+          'تم توصيل الطلب بنجاح.',
+          color: Colors.green,
+        );
+
+      case OrderStatus.cancelled:
+        return const _OrderMessage(
+          icon: Icons.cancel_outlined,
+          message:
+          'تم إلغاء هذا الطلب.',
+          color: Colors.red,
+        );
+    }
+  }
+
+  String _paymentMethodLabel(
+      PaymentMethod method,
+      ) {
     switch (method) {
       case PaymentMethod.cash:
         return 'دفع نقدي';
@@ -198,7 +267,10 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 20),
+        Icon(
+          icon,
+          size: 20,
+        ),
         const SizedBox(width: 8),
         Text(
           title,
@@ -208,6 +280,51 @@ class _SectionTitle extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _OrderMessage extends StatelessWidget {
+  final IconData icon;
+  final String message;
+  final Color color;
+
+  const _OrderMessage({
+    required this.icon,
+    required this.message,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.35),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: color,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

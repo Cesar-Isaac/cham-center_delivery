@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../order_tracking/presentation/pages/order_tracking_page.dart';
+import '../../domain/entities/enums.dart';
 import '../manager/user_order_cubit.dart';
 import '../manager/user_order_state.dart';
 import '../widgets/user_order_card.dart';
@@ -71,8 +73,57 @@ class _UserOrdersPageState extends State<UserOrdersPage> {
                 return const SizedBox(height: 16);
               },
               itemBuilder: (context, index) {
+                final order = state.orders[index];
+
                 return UserOrderCard(
-                  order: state.orders[index],
+                  order: order,
+                  onTrack:
+                  order.status == OrderStatus.delivering
+                      ? () async {
+                    final delivery = order.delivery;
+
+                    final hasStartLocation =
+                    !(delivery.fromLatitude == 0 &&
+                        delivery.fromLongitude ==
+                            0);
+
+                    final hasEndLocation =
+                    !(delivery.toLatitude == 0 &&
+                        delivery.toLongitude ==
+                            0);
+
+                    if (!hasStartLocation ||
+                        !hasEndLocation) {
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'إحداثيات التوصيل غير متوفرة.',
+                            ),
+                            backgroundColor:
+                            Colors.red,
+                            behavior:
+                            SnackBarBehavior.floating,
+                          ),
+                        );
+
+                      return;
+                    }
+
+                    await Navigator.pushNamed(
+                      context,
+                      OrderTrackingPage.route,
+                      arguments: order,
+                    );
+
+                    if (!context.mounted) return;
+
+                    await context
+                        .read<UserOrderCubit>()
+                        .loadOrders();
+                  }
+                      : null,
                 );
               },
             ),
