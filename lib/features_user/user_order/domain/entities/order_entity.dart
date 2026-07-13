@@ -1,8 +1,9 @@
+import '../../../authentication/domain/entities/user_entity.dart';
 import '../../../cart/domain/entities/cart_entity.dart';
 import 'delivery_entity.dart';
 import 'driver_entity.dart';
 import 'enums.dart';
-import 'user_entity.dart';
+
 
 class OrderEntity {
   final String id;

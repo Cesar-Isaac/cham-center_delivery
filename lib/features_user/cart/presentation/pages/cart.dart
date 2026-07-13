@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tracking_provider/core/style/repo/app_colors.dart';
 
 import '../../../../core/style/widgets/custom_bottom.dart';
 import '../../../payment/presentation/pages/Payment_options.dart';
@@ -104,33 +105,100 @@ class Cart extends StatelessWidget {
                   ],
                 ),
               ),
-              _CartSummary(
-                totalItems: state.totalItems,
-                totalPrice: state.totalPrice,
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  16,
-                  0,
-                  16,
-                  16,
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: CustomButton(
-                    text: 'Pay',
-                    onPressed: () {
-                      if (state.loading) return;
 
-                      Navigator.pushNamed(
-                        context,
-                        PaymentOptions.route,
-                      );
-                    },
-                  )
-                ),
-              ),
+
             ],
+          ),
+
+          bottomNavigationBar: state.items.isEmpty
+              ? null
+              : SafeArea(
+            top: false,
+            child: Container(
+              width: double.infinity,
+              height: 150,
+              padding: const EdgeInsets.fromLTRB(
+                24,
+                18,
+                24,
+                22,
+              ),
+              decoration: const BoxDecoration(
+                color: AppColors.bgCard,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 16,
+                    offset: Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Total Price: '
+                        '\$${state.totalPrice.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: FilledButton(
+                      onPressed: state.loading
+                          ? null
+                          : () {
+                        Navigator.pushNamed(
+                          context,
+                          PaymentOptions.route,
+                          arguments: {
+                            'cartItems': state.items,
+                            'totalPrice':
+                            state.totalPrice,
+                          },
+                        );
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor:AppColors.primary,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor:
+                        Colors.grey.shade400,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius.circular(28),
+                        ),
+                      ),
+                      child: state.loading
+                          ? const SizedBox(
+                        width: 23,
+                        height: 23,
+                        child:
+                        CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                          : const Text(
+                        'Pay',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },
@@ -199,45 +267,6 @@ class _EmptyCart extends StatelessWidget {
           Text(
             'Add products to see them here.',
             style: TextStyle(color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CartSummary extends StatelessWidget {
-  final int totalItems;
-  final double totalPrice;
-
-  const _CartSummary({
-    required this.totalItems,
-    required this.totalPrice,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Items: $totalItems',
-            style: const TextStyle(fontSize: 16),
-          ),
-          Text(
-            'Total: ${totalPrice.toStringAsFixed(2)}',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
           ),
         ],
       ),

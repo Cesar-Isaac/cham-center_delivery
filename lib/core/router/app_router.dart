@@ -6,6 +6,8 @@ import '../../features_user/authentication/presentation/manager/auth_cubit.dart'
 import '../../features_user/authentication/presentation/pages/location_picker_page.dart';
 import '../../features_user/authentication/presentation/pages/login_page.dart';
 import '../../features_user/authentication/presentation/pages/signup_page.dart';
+import '../../features_user/cart/domain/entities/cart_entity.dart';
+import '../../features_user/cart/presentation/manager/cart_cubit.dart';
 import '../../features_user/home/domain/entities/store_entity.dart';
 import '../../features_user/home/presentation/manager/home_cubit.dart';
 import '../../features_user/home/presentation/manager/navigation_cubit.dart';
@@ -118,12 +120,14 @@ class AppRouter {
                 BlocProvider<NavigationCubit>.value(
                   value: userGetIt.navigationCubit,
                 ),
+                BlocProvider<UserOrderCubit>.value(
+                  value: getIt.userOrderCubit,
+                ),
               ],
               child: const HomePage(),
             );
           },
         );
-
     /// Products
       case ProductPage.route:
         final Object? arguments = settings.arguments;
@@ -170,8 +174,15 @@ class AppRouter {
 
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => BlocProvider.value(
-            value: userGetIt.productCubit,
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(
+                value: userGetIt.productCubit,
+              ),
+              BlocProvider<CartCubit>.value(
+                value: getIt.cartCubit,
+              ),
+            ],
             child: ProductDetailsPage(
               product: arguments,
             ),
@@ -230,35 +241,129 @@ class AppRouter {
             child: const Cart(),
           ),
         );
+
         //payment options page
       case PaymentOptions.route:
+        final arguments = settings.arguments;
+
+        if (arguments is! Map<String, dynamic>) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const Scaffold(
+              body: Center(
+                child: Text('بيانات السلة غير متوفرة.'),
+              ),
+            ),
+          );
+        }
+
+        final cartItemsArgument = arguments['cartItems'];
+        final totalPriceArgument = arguments['totalPrice'];
+
+        if (cartItemsArgument is! List ||
+            totalPriceArgument is! num) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const Scaffold(
+              body: Center(
+                child: Text('بيانات السلة غير صحيحة.'),
+              ),
+            ),
+          );
+        }
+
+        final cartItems = List<CartEntity>.from(
+          cartItemsArgument,
+        );
+
+        final totalPrice = totalPriceArgument.toDouble();
+
         return MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
-            value: getIt.paymentCubit,
-            child: const PaymentOptions(),
+          settings: settings,
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(
+                value: getIt.paymentCubit,
+              ),
+              BlocProvider<AuthCubit>.value(
+                value: userGetIt.authCubit,
+              ),
+              BlocProvider<UserOrderCubit>.value(
+                value: getIt.userOrderCubit,
+              ),
+              BlocProvider<CartCubit>.value(
+                value: getIt.cartCubit,
+              ),
+            ],
+            child: PaymentOptions(
+              cartItems: cartItems,
+              totalPrice: totalPrice,
+            ),
           ),
         );
+
         // Payment page
       case PaymentPage.route:
+        final arguments = settings.arguments;
 
-        final args = settings.arguments as Map<String, dynamic>;
-        return MaterialPageRoute(
-
-          builder: (_) => BlocProvider.value(
-
-            value: getIt.paymentCubit,
-
-            child: PaymentPage(
-
-              orderId: args['orderId'],
-
-              amount: args['amount'],
-
+        if (arguments is! Map<String, dynamic>) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const Scaffold(
+              body: Center(
+                child: Text('بيانات الدفع غير متوفرة.'),
+              ),
             ),
+          );
+        }
 
-          ),
+        final orderIdArgument = arguments['orderId'];
+        final amountArgument = arguments['amount'];
+        final cartItemsArgument = arguments['cartItems'];
 
+        if (orderIdArgument is! num ||
+            amountArgument is! num ||
+            cartItemsArgument is! List) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const Scaffold(
+              body: Center(
+                child: Text('بيانات الدفع غير صحيحة.'),
+              ),
+            ),
+          );
+        }
+
+        final cartItems = List<CartEntity>.from(
+          cartItemsArgument,
         );
+
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(
+                value: getIt.paymentCubit,
+              ),
+              BlocProvider<AuthCubit>.value(
+                value: userGetIt.authCubit,
+              ),
+              BlocProvider<UserOrderCubit>.value(
+                value: getIt.userOrderCubit,
+              ),
+              BlocProvider<CartCubit>.value(
+                value: getIt.cartCubit,
+              ),
+            ],
+            child: PaymentPage(
+              orderId: orderIdArgument.toInt(),
+              amount: amountArgument.toInt(),
+              cartItems: cartItems,
+            ),
+          ),
+        );
+
+
         //////////////////// user orders
       case UserOrdersPage.route:
         return MaterialPageRoute(

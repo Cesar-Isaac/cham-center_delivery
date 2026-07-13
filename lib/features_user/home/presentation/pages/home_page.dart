@@ -5,10 +5,10 @@ import '../../../../core/style/repo/app_colors.dart';
 import '../../../../core/style/style/app_theme.dart';
 
 import '../../../authentication/presentation/manager/auth_cubit.dart';
-import '../../../orders/presentation/pages/order_page.dart';
-
+import '../../../cart/presentation/pages/cart.dart';
 import '../../../product/presentation/pages/product_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
+import '../../../user_order/presentation/pages/user_order_page.dart';
 import '../manager/home_cubit.dart';
 import '../manager/home_state.dart';
 import '../manager/navigation_cubit.dart';
@@ -29,7 +29,7 @@ class HomePage extends StatelessWidget {
             index: navigationState.selectedIndex,
             children: const [
               _HomeContent(),
-              OrdersPage(),
+              UserOrdersPage(),
               ProfilePage(),
             ],
           ),
@@ -455,9 +455,14 @@ class _HomeHeader extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              Cart.route,
+            );
+          },
           icon: const Icon(
-            Icons.notifications_none_rounded,
+            Icons.shopping_cart_outlined,
           ),
         ),
       ],

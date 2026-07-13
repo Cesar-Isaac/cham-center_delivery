@@ -3,7 +3,6 @@ class LocationConstants {
 
   static const String mallName = 'مول الشام سنتر';
 
-  // استبدليهما بالإحداثيات الحقيقية للمول
-  static const double mallLatitude = 0;
-  static const double mallLongitude = 0;
+  static const double mallLatitude = 33.50093797650132;
+  static const double mallLongitude = 36.274040299357985;
 }

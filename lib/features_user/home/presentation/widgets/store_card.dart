@@ -65,7 +65,10 @@ class StoreCard extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
                   child: Column(
                     crossAxisAlignment:
                     CrossAxisAlignment.start,
