@@ -5,7 +5,7 @@ class IncreaseQuantityUseCase {
 
   IncreaseQuantityUseCase(this.repository);
 
-  void call(int productId) {
-    repository.increaseQuantity(productId);
+  Future<void> call(int productId) async {
+    await repository.increaseQuantity(productId);
   }
 }

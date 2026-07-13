@@ -6,7 +6,7 @@ class AddProductUseCase {
 
   AddProductUseCase(this.repository);
 
-  void call(ProductEntity product) {
-    repository.addProduct(product);
+  Future<void> call(ProductEntity product) async {
+    await repository.addProduct(product);
   }
 }

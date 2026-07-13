@@ -16,14 +16,14 @@ import '../../features-provider/driver/presentation/screens/main/driver_main_scr
 import '../../features-provider/driver/presentation/screens/trip/trip_screen.dart';
 import '../../features-provider/history/presentation/screens/history_screen.dart';
 import '../../features-provider/splash/presentation/screens/splash_screen.dart';
+import '../../features_user/payment/presentation/pages/Payment_options.dart';
+import '../../features_user/payment/presentation/pages/payment_page.dart';
 import '../../features_user/role/presentation/pages/role_page.dart';
 import '../di/service_user_locator.dart';
 import '../di/service_locator.dart';
 
-import '../../features_user/home/domain/entities/store_entity.dart';
 import '../../features_user/product/domain/entities/product_entity.dart';
 import '../../features_user/product/presentation/pages/product_details_page.dart';
-import '../../features_user/product/presentation/pages/product_page.dart';
 
 
 class AppRouter {
@@ -217,12 +217,44 @@ class AppRouter {
     //       ),
     //     );
 
+    /////// cart page
       case Cart.route:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
             value: getIt.cartCubit,
             child: const Cart(),
           ),
+        );
+        //payment options page
+      case PaymentOptions.route:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: getIt.paymentCubit,
+            child: const PaymentOptions(),
+          ),
+        );
+        // Payment page
+      case PaymentPage.route:
+
+        final args = settings.arguments as Map<String, dynamic>;
+
+
+        return MaterialPageRoute(
+
+          builder: (_) => BlocProvider.value(
+
+            value: getIt.paymentCubit,
+
+            child: PaymentPage(
+
+              orderId: args['orderId'],
+
+              amount: args['amount'],
+
+            ),
+
+          ),
+
         );
         default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());

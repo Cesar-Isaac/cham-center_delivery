@@ -6,7 +6,7 @@ class ClearCartUseCase {
 
   ClearCartUseCase(this.repository);
 
-  void call() {
-    repository.clearCart();
+  Future<void> call() async {
+    await repository.clearCart();
   }
 }
