@@ -22,7 +22,7 @@ class UserOrderCubit extends Cubit<UserOrderState> {
   final Map<String, Timer> _deliveryTimers = {};
 
   static const Duration deliveryStartDelay =
-  Duration(seconds: 5);
+  Duration(seconds: 20);
 
   UserOrderCubit({
     required this.createUserOrderUseCase,
