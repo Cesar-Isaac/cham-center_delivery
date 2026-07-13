@@ -18,6 +18,7 @@ import '../../features-provider/history/presentation/screens/history_screen.dart
 import '../../features-provider/splash/presentation/screens/splash_screen.dart';
 import '../../features_user/payment/presentation/pages/Payment_options.dart';
 import '../../features_user/payment/presentation/pages/payment_page.dart';
+import '../../features_user/user_order/presentation/pages/user_order_page.dart';
 import '../../features_user/role/presentation/pages/role_page.dart';
 import '../di/service_user_locator.dart';
 import '../di/service_locator.dart';
@@ -237,8 +238,6 @@ class AppRouter {
       case PaymentPage.route:
 
         final args = settings.arguments as Map<String, dynamic>;
-
-
         return MaterialPageRoute(
 
           builder: (_) => BlocProvider.value(
@@ -256,6 +255,15 @@ class AppRouter {
           ),
 
         );
+        //////////////////// user orders
+      case UserOrdersPage.route:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: getIt.userOrderCubit,
+            child: const UserOrdersPage(),
+          ),
+        );
+
         default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+// Provider section
 import '../../features-provider/driver/data/gps/driver_gps_repository.dart';
 import '../../features-provider/driver/data/simulation/order_simulation_repository.dart';
 import '../../features-provider/driver/data/simulation/trip_simulation_repository.dart';
@@ -26,13 +27,27 @@ import '../../features_user/payment/data/repositories_impl/payment_repository_im
 import '../../features_user/payment/domain/usecases/payment_usecase.dart';
 import '../../features_user/payment/presentation/manager/payment_cubit.dart';
 
+// User Order
+import '../../features_user/user_order/data/data_sources/driver_local_data.dart';
+import '../../features_user/user_order/data/data_sources/user_order_local_data.dart';
+import '../../features_user/user_order/data/repositories_impl/user_order_repository_impl.dart';
+import '../../features_user/user_order/domain/usecases/create_user_order_usecase.dart';
+import '../../features_user/user_order/domain/usecases/get_user_orders_usecase.dart.dart';
+import '../../features_user/user_order/presentation/manager/user_order_cubit.dart';
+
 class Locator {
   final HistoryRepository history;
   final CartLocalDataSource cartLocalDataSource;
+  final UserOrderLocalDataSource userOrderLocalDataSource;
 
   Locator({required SharedPreferences prefs})
       : history = HistoryLocalRepository(prefs: prefs),
-        cartLocalDataSource = CartLocalDataSource(prefs);
+        cartLocalDataSource = CartLocalDataSource(prefs),
+        userOrderLocalDataSource =
+        UserOrderLocalDataSourceImpl(prefs);
+
+  ////////////////////////////////////////////////////////////
+  // Provider section
   ////////////////////////////////////////////////////////////
 
   final DriverRepository driver = DriverGpsRepository();
@@ -41,6 +56,8 @@ class Locator {
 
   final TripRepository trips = TripSimulationRepository();
 
+  ////////////////////////////////////////////////////////////
+  // User Cart
 
 
 
@@ -77,21 +94,56 @@ class Locator {
     clearCartUseCase: clearCartUseCase,
   )..loadCart();
 
+  ////////////////////////////////////////////////////////////
+  // User Order
+  ////////////////////////////////////////////////////////////
 
-  // payment
+  final UserOrderDriverLocalDataSource
+  userOrderDriverLocalDataSource =
+  UserOrderDriverLocalDataSource();
+
+  late final UserOrderRepositoryImpl userOrderRepository =
+  UserOrderRepositoryImpl(
+    userOrderLocalDataSource,
+    userOrderDriverLocalDataSource,
+  );
+
+  late final CreateUserOrderUseCase createUserOrderUseCase =
+  CreateUserOrderUseCase(
+    userOrderRepository,
+  );
+
+  late final GetUserOrdersUseCase getUserOrdersUseCase =
+  GetUserOrdersUseCase(
+    userOrderRepository,
+  );
+
+  late final UserOrderCubit userOrderCubit = UserOrderCubit(
+    createUserOrderUseCase: createUserOrderUseCase,
+    getUserOrdersUseCase: getUserOrdersUseCase,
+    clearCartUseCase: clearCartUseCase,
+  )..loadOrders();
+
+  ////////////////////////////////////////////////////////////
+  // User Payment
   ////////////////////////////////////////////////////////////
 
   final PaymentRemoteDataSource paymentRemoteDataSource =
   PaymentRemoteDataSourceImpl();
 
   late final PaymentRepositoryImpl paymentRepository =
-  PaymentRepositoryImpl(paymentRemoteDataSource);
+  PaymentRepositoryImpl(
+    paymentRemoteDataSource,
+  );
 
   late final InitializePaymentUseCase initializePaymentUseCase =
-  InitializePaymentUseCase(paymentRepository);
+  InitializePaymentUseCase(
+    paymentRepository,
+  );
 
-  late final PaymentCubit paymentCubit =
-  PaymentCubit(initializePaymentUseCase);
+  late final PaymentCubit paymentCubit = PaymentCubit(
+    initializePaymentUseCase,
+  );
 }
 
 late final Locator getIt;
