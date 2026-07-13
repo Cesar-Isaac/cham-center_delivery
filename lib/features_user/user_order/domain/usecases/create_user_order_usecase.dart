@@ -1,3 +1,4 @@
+import '../../../../core/constants/location_constants.dart';
 import '../../../../core/utils/order_id_generator.dart';
 import '../../../cart/domain/entities/cart_entity.dart';
 import '../entities/delivery_entity.dart';
@@ -23,8 +24,12 @@ class CreateUserOrderUseCase {
     final driver = repository.getRandomDriver();
 
     final delivery = DeliveryEntity(
-      from: 'مول الشام سنتر',
+      from: LocationConstants.mallName,
       to: user.address,
+      fromLatitude: LocationConstants.mallLatitude,
+      fromLongitude: LocationConstants.mallLongitude,
+      toLatitude: user.latitude,
+      toLongitude: user.longitude,
     );
 
     final totalPrice = cartItems.fold<double>(

@@ -5,21 +5,29 @@ class UserModel extends UserEntity {
     required super.name,
     required super.phone,
     required super.address,
+    required super.latitude,
+    required super.longitude,
   });
-
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      name: json['name'] ?? '',
-      phone: json['phone'] ?? '',
-      address: json['address'] ?? '',
-    );
-  }
 
   factory UserModel.fromEntity(UserEntity entity) {
     return UserModel(
       name: entity.name,
       phone: entity.phone,
       address: entity.address,
+      latitude: entity.latitude,
+      longitude: entity.longitude,
+    );
+  }
+
+  factory UserModel.fromJson(
+      Map<String, dynamic> json,
+      ) {
+    return UserModel(
+      name: json['name']?.toString() ?? '',
+      phone: json['phone']?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      latitude: (json['latitude'] as num? ?? 0).toDouble(),
+      longitude: (json['longitude'] as num? ?? 0).toDouble(),
     );
   }
 
@@ -28,6 +36,8 @@ class UserModel extends UserEntity {
       'name': name,
       'phone': phone,
       'address': address,
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 }

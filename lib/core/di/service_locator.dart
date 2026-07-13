@@ -33,7 +33,18 @@ import '../../features_user/user_order/data/data_sources/user_order_local_data.d
 import '../../features_user/user_order/data/repositories_impl/user_order_repository_impl.dart';
 import '../../features_user/user_order/domain/usecases/create_user_order_usecase.dart';
 import '../../features_user/user_order/domain/usecases/get_user_orders_usecase.dart.dart';
+import '../../features_user/user_order/domain/usecases/update_user_order_status_usecase.dart';
 import '../../features_user/user_order/presentation/manager/user_order_cubit.dart';
+
+/////////////////
+import 'package:http/http.dart' as http;
+import '../../features_user/order_tracking/data/data_sources/route_remote_data_source.dart';
+import '../../features_user/order_tracking/data/repositories_impl/order_tracking_repository_impl.dart';
+import '../../features_user/order_tracking/domain/usecases/get_order_route_usecase.dart';
+import '../../features_user/order_tracking/presentation/manager/order_tracking_cubit.dart';
+
+
+
 
 class Locator {
   final HistoryRepository history;
@@ -93,10 +104,9 @@ class Locator {
     decreaseQuantityUseCase: decreaseQuantityUseCase,
     clearCartUseCase: clearCartUseCase,
   )..loadCart();
-
-  ////////////////////////////////////////////////////////////
-  // User Order
-  ////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+// User Order
+////////////////////////////////////////////////////////////
 
   final UserOrderDriverLocalDataSource
   userOrderDriverLocalDataSource =
@@ -118,11 +128,50 @@ class Locator {
     userOrderRepository,
   );
 
+  late final UpdateUserOrderStatusUseCase
+  updateUserOrderStatusUseCase =
+  UpdateUserOrderStatusUseCase(
+    userOrderRepository,
+  );
+
   late final UserOrderCubit userOrderCubit = UserOrderCubit(
     createUserOrderUseCase: createUserOrderUseCase,
     getUserOrdersUseCase: getUserOrdersUseCase,
+    updateUserOrderStatusUseCase:
+    updateUserOrderStatusUseCase,
     clearCartUseCase: clearCartUseCase,
   )..loadOrders();
+
+  ////////////////////////////////////////////////////////////
+// Order Tracking
+////////////////////////////////////////////////////////////
+
+  final http.Client orderTrackingHttpClient =
+  http.Client();
+
+  late final RouteRemoteDataSource
+  routeRemoteDataSource =
+  RouteRemoteDataSourceImpl(
+    orderTrackingHttpClient,
+  );
+
+  late final OrderTrackingRepositoryImpl
+  orderTrackingRepository =
+  OrderTrackingRepositoryImpl(
+    routeRemoteDataSource,
+  );
+
+  late final GetOrderRouteUseCase
+  getOrderRouteUseCase =
+  GetOrderRouteUseCase(
+    orderTrackingRepository,
+  );
+
+  OrderTrackingCubit createOrderTrackingCubit() {
+    return OrderTrackingCubit(
+      getOrderRouteUseCase: getOrderRouteUseCase,
+    );
+  }
 
   ////////////////////////////////////////////////////////////
   // User Payment
