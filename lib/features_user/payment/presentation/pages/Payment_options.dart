@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tracking_provider/core/style/style/app_theme.dart';
 import 'package:tracking_provider/core/style/widgets/custom_bottom.dart';
 import 'package:tracking_provider/features_user/payment/presentation/pages/payment_page.dart';
 
