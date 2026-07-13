@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/style/repo/app_colors.dart';
 import '../../../../core/style/style/app_theme.dart';
 import '../../../../core/style/widgets/primary_button.dart';
+import '../../../cart/presentation/manager/cart_cubit.dart';
 import '../../domain/entities/product_entity.dart';
 import '../manager/product_cubit.dart';
 import '../manager/product_state.dart';
@@ -275,15 +276,31 @@ class ProductDetailsPage extends StatelessWidget {
                 icon:
                 Icons.shopping_cart_outlined,
                 onPressed: product.isAvailable
-                    ? () {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Cart logic will be connected later.',
-                      ),
-                    ),
+                    ? () async {
+                  final cartCubit =
+                  context.read<CartCubit>();
+
+                  final added = await cartCubit.addProduct(
+                    product,
                   );
+
+                  if (!context.mounted) return;
+
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          added
+                              ? 'تمت إضافة المنتج إلى السلة.'
+                              : cartCubit.state.error ??
+                              'تعذر إضافة المنتج إلى السلة.',
+                        ),
+                        backgroundColor:
+                        added ? Colors.green : Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
                 }
                     : null,
               ),

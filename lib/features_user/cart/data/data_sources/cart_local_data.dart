@@ -16,8 +16,13 @@ class CartLocalDataSource {
     final jsonList =
         sharedPreferences.getStringList(_cartKey) ?? [];
 
-    return jsonList.map((item) {
-      final json = jsonDecode(item) as Map<String, dynamic>;
+    return jsonList.map<CartEntity>((item) {
+      final decoded = jsonDecode(item);
+
+      final json = Map<String, dynamic>.from(
+        decoded as Map,
+      );
+
       return CartModel.fromJson(json);
     }).toList();
   }

@@ -46,19 +46,30 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-  Future<void> addProduct(ProductEntity product) async {
-    emit(state.copyWith(loading: true));
+  Future<bool> addProduct(ProductEntity product) async {
+    emit(
+      state.copyWith(
+        loading: true,
+      ),
+    );
 
     try {
       await addProductUseCase(product);
+
       loadCart();
+
+      return true;
     } catch (e) {
       emit(
         state.copyWith(
           loading: false,
-          error: e.toString(),
+          error: e
+              .toString()
+              .replaceFirst('Exception: ', ''),
         ),
       );
+
+      return false;
     }
   }
 

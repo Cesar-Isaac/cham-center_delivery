@@ -6,6 +6,7 @@ import '../../features_user/authentication/presentation/manager/auth_cubit.dart'
 import '../../features_user/authentication/presentation/pages/location_picker_page.dart';
 import '../../features_user/authentication/presentation/pages/login_page.dart';
 import '../../features_user/authentication/presentation/pages/signup_page.dart';
+import '../../features_user/cart/presentation/manager/cart_cubit.dart';
 import '../../features_user/home/domain/entities/store_entity.dart';
 import '../../features_user/home/presentation/manager/home_cubit.dart';
 import '../../features_user/home/presentation/manager/navigation_cubit.dart';
@@ -170,8 +171,15 @@ class AppRouter {
 
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => BlocProvider.value(
-            value: userGetIt.productCubit,
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(
+                value: userGetIt.productCubit,
+              ),
+              BlocProvider<CartCubit>.value(
+                value: getIt.cartCubit,
+              ),
+            ],
             child: ProductDetailsPage(
               product: arguments,
             ),
