@@ -1,10 +1,11 @@
+import '../../../authentication/data/models/user_model.dart';
 import '../../domain/entities/order_entity.dart';
 import '../../domain/entities/enums.dart';
 
 import '../../../cart/data/models/cart_model.dart';
 import 'delivery_model.dart';
 import 'driver_model.dart';
-import 'user_model.dart';
+
 
 class OrderModel extends OrderEntity {
   const OrderModel({

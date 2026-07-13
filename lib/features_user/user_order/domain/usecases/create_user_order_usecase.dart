@@ -1,10 +1,10 @@
 import '../../../../core/constants/location_constants.dart';
 import '../../../../core/utils/order_id_generator.dart';
+import '../../../authentication/domain/entities/user_entity.dart';
 import '../../../cart/domain/entities/cart_entity.dart';
 import '../entities/delivery_entity.dart';
 import '../entities/enums.dart';
 import '../entities/order_entity.dart';
-import '../entities/user_entity.dart';
 import '../repositories/user_order_repository.dart';
 
 class CreateUserOrderUseCase {

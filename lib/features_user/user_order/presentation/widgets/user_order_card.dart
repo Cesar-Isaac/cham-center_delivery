@@ -114,7 +114,7 @@ class UserOrderCard extends StatelessWidget {
           OrderInformationRow(
             icon: Icons.person_outline,
             label: 'المستخدم',
-            value: order.user.name,
+            value: order.user.fullName,
           ),
 
           OrderInformationRow(

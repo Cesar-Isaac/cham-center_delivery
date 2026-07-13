@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../authentication/domain/entities/user_entity.dart';
 import '../../../cart/domain/entities/cart_entity.dart';
 import '../../../cart/domain/usecases/clear_cart.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/entities/order_entity.dart';
-import '../../domain/entities/user_entity.dart';
 import '../../domain/usecases/create_user_order_usecase.dart';
 import '../../domain/usecases/get_user_orders_usecase.dart.dart';
 import '../../domain/usecases/update_user_order_status_usecase.dart';
