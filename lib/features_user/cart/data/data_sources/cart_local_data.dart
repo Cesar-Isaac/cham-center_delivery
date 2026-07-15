@@ -32,10 +32,10 @@ class CartLocalDataSource {
 
     if (cartItems.isNotEmpty) {
       final hasFood = cartItems.any(
-            (element) => element.product.category == 'food',
+            (element) => element.product.category == 'Food',
       );
 
-      final isFood = item.product.category == 'food';
+      final isFood = item.product.category == 'Food';
 
       if (hasFood && !isFood) {
         throw Exception(
