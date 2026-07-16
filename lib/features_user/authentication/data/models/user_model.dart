@@ -10,6 +10,8 @@ class UserModel extends UserEntity {
     required super.address,
     required super.latitude,
     required super.longitude,
+    super.vehicleType,
+    super.vehiclePlate,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -22,6 +24,8 @@ class UserModel extends UserEntity {
       address: json['address'] as String? ?? '',
       latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
       longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+      vehicleType: json['vehicleType'] as String?,
+      vehiclePlate: json['vehiclePlate'] as String?,
     );
   }
 
@@ -35,6 +39,8 @@ class UserModel extends UserEntity {
       address: user.address,
       latitude: user.latitude,
       longitude: user.longitude,
+      vehicleType: user.vehicleType,
+      vehiclePlate: user.vehiclePlate,
     );
   }
 
@@ -48,6 +54,8 @@ class UserModel extends UserEntity {
       'address': address,
       'latitude': latitude,
       'longitude': longitude,
+      'vehicleType': vehicleType,
+      'vehiclePlate': vehiclePlate,
     };
   }
 
@@ -61,6 +69,8 @@ class UserModel extends UserEntity {
     String? address,
     double? latitude,
     double? longitude,
+    String? vehicleType,
+    String? vehiclePlate,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -71,6 +81,8 @@ class UserModel extends UserEntity {
       address: address ?? this.address,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      vehicleType: vehicleType ?? this.vehicleType,
+      vehiclePlate: vehiclePlate ?? this.vehiclePlate,
     );
   }
 }

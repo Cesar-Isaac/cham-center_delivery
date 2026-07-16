@@ -9,6 +9,7 @@ enum AuthStatus {
   signupSuccess,
   authenticated,
   unauthenticated,
+  profileUpdated,
   failure,
 }
 

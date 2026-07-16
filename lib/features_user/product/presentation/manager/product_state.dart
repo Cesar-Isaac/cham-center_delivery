@@ -16,7 +16,6 @@ class ProductState extends Equatable {
     this.store,
     this.allProducts = const [],
     this.filteredProducts = const [],
-    this.favoriteIds = const [],
     this.searchQuery = '',
     this.selectedCategory = 'All',
     this.errorMessage = '',
@@ -28,8 +27,6 @@ class ProductState extends Equatable {
   final List<ProductEntity> allProducts;
   final List<ProductEntity> filteredProducts;
 
-  final List<int> favoriteIds;
-
   final String searchQuery;
   final String selectedCategory;
   final String errorMessage;
@@ -39,7 +36,6 @@ class ProductState extends Equatable {
     StoreEntity? store,
     List<ProductEntity>? allProducts,
     List<ProductEntity>? filteredProducts,
-    List<int>? favoriteIds,
     String? searchQuery,
     String? selectedCategory,
     String? errorMessage,
@@ -50,16 +46,11 @@ class ProductState extends Equatable {
       allProducts: allProducts ?? this.allProducts,
       filteredProducts:
       filteredProducts ?? this.filteredProducts,
-      favoriteIds: favoriteIds ?? this.favoriteIds,
       searchQuery: searchQuery ?? this.searchQuery,
       selectedCategory:
       selectedCategory ?? this.selectedCategory,
       errorMessage: errorMessage ?? this.errorMessage,
     );
-  }
-
-  bool isFavorite(int productId) {
-    return favoriteIds.contains(productId);
   }
 
   double ratingFor(int productId) {
@@ -81,7 +72,6 @@ class ProductState extends Equatable {
     store,
     allProducts,
     filteredProducts,
-    favoriteIds,
     searchQuery,
     selectedCategory,
     errorMessage,

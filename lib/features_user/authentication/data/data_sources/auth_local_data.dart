@@ -5,14 +5,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/entities/user_entity.dart';
 
 class AuthLocalDataSource {
-  AuthLocalDataSource(this.prefs);
+  /// مفاتيح التخزين قابلة للتخصيص حتى يكون حساب السائق
+  /// منفصلاً تماماً عن حساب المستخدم.
+  AuthLocalDataSource(
+      this.prefs, {
+        String userKey = 'registered_user',
+        String sessionKey = 'user_logged_in',
+      })  : _userKey = userKey,
+        _sessionKey = sessionKey;
 
   final SharedPreferences prefs;
 
-  static const String _userKey = 'registered_user';
-  static const String _sessionKey = 'user_logged_in';
+  final String _userKey;
+  final String _sessionKey;
 
   Future<void> saveUser(UserEntity user) async {
+    await _writeUser(user);
+
+    // بعد إنشاء الحساب نطلب من المستخدم تسجيل الدخول.
+    await prefs.setBool(_sessionKey, false);
+  }
+
+  /// تحديث بيانات الحساب دون إنهاء الجلسة الحالية.
+  Future<void> updateUser(UserEntity user) async {
+    await _writeUser(user);
+  }
+
+  Future<void> _writeUser(UserEntity user) async {
     final Map<String, dynamic> json = {
       'id': user.id,
       'fullName': user.fullName,
@@ -22,15 +41,14 @@ class AuthLocalDataSource {
       'address': user.address,
       'latitude': user.latitude,
       'longitude': user.longitude,
+      'vehicleType': user.vehicleType,
+      'vehiclePlate': user.vehiclePlate,
     };
 
     await prefs.setString(
       _userKey,
       jsonEncode(json),
     );
-
-    // بعد إنشاء الحساب نطلب من المستخدم تسجيل الدخول.
-    await prefs.setBool(_sessionKey, false);
   }
 
   UserEntity? getUser() {
@@ -53,6 +71,8 @@ class AuthLocalDataSource {
         address: json['address'] as String,
         latitude: (json['latitude'] as num).toDouble(),
         longitude: (json['longitude'] as num).toDouble(),
+        vehicleType: json['vehicleType'] as String?,
+        vehiclePlate: json['vehiclePlate'] as String?,
       );
     } catch (_) {
       return null;

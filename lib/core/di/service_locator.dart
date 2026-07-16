@@ -7,8 +7,13 @@ import '../../features-provider/driver/data/simulation/trip_simulation_repositor
 import '../../features-provider/driver/domain/repositories/driver_repository.dart';
 import '../../features-provider/driver/domain/repositories/order_repository.dart';
 import '../../features-provider/driver/domain/repositories/trip_repository.dart';
+import '../../features-provider/driver/presentation/state/trip/trip_cubit.dart';
 import '../../features-provider/history/data/history_local_repository.dart';
 import '../../features-provider/history/domain/repositories/history_repository.dart';
+import '../../features-provider/history/presentation/state/history_cubit.dart';
+import '../../features-provider/wallet/data/wallet_local_repository.dart';
+import '../../features-provider/wallet/domain/repositories/wallet_repository.dart';
+import '../../features-provider/wallet/presentation/state/wallet_cubit.dart';
 
 // User Cart
 import '../../features_user/cart/data/data_sources/cart_local_data.dart';
@@ -48,11 +53,13 @@ import '../../features_user/order_tracking/presentation/manager/order_tracking_c
 
 class Locator {
   final HistoryRepository history;
+  final WalletRepository wallet;
   final CartLocalDataSource cartLocalDataSource;
   final UserOrderLocalDataSource userOrderLocalDataSource;
 
   Locator({required SharedPreferences prefs})
       : history = HistoryLocalRepository(prefs: prefs),
+        wallet = WalletLocalRepository(prefs: prefs),
         cartLocalDataSource = CartLocalDataSource(prefs),
         userOrderLocalDataSource =
         UserOrderLocalDataSourceImpl(prefs);
@@ -66,6 +73,14 @@ class Locator {
   final OrderRepository orders = OrderSimulationRepository();
 
   final TripRepository trips = TripSimulationRepository();
+
+  // Cubits مشتركة بين الشاشة الرئيسية للسائق وشاشات الرحلة/السجل/المحفظة،
+  // موجودة هنا حتى يستطيع AppRouter توفيرها عبر المسارات المسماة.
+  late final TripCubit tripCubit = TripCubit(tripRepo: trips);
+
+  late final HistoryCubit historyCubit = HistoryCubit(repo: history);
+
+  late final WalletCubit walletCubit = WalletCubit(repo: wallet);
 
   ////////////////////////////////////////////////////////////
   // User Cart

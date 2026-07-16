@@ -6,6 +6,9 @@ import '../../../../core/style/style/app_theme.dart';
 
 import '../../../authentication/presentation/manager/auth_cubit.dart';
 import '../../../cart/presentation/pages/cart.dart';
+import '../../../favorites/presentation/manager/favorites_cubit.dart';
+import '../../../favorites/presentation/manager/favorites_state.dart';
+import '../../../favorites/presentation/pages/favorites_page.dart';
 import '../../../product/presentation/pages/product_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 import '../../../user_order/presentation/pages/user_order_page.dart';
@@ -29,6 +32,7 @@ class HomePage extends StatelessWidget {
             index: navigationState.selectedIndex,
             children: const [
               _HomeContent(),
+              FavoritesPage(),
               UserOrdersPage(),
               ProfilePage(),
             ],
@@ -52,6 +56,16 @@ class HomePage extends StatelessWidget {
                   color: AppColors.primary,
                 ),
                 label: 'Home',
+              ),
+              NavigationDestination(
+                icon: Icon(
+                  Icons.favorite_border_rounded,
+                ),
+                selectedIcon: Icon(
+                  Icons.favorite_rounded,
+                  color: AppColors.primary,
+                ),
+                label: 'Favorites',
               ),
               NavigationDestination(
                 icon: Icon(
@@ -88,6 +102,9 @@ class _HomeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
+        final FavoritesState favoritesState =
+        context.watch<FavoritesCubit>().state;
+
         if (state.status == HomeStatus.loading ||
             state.status == HomeStatus.initial) {
           return const Center(
@@ -257,12 +274,17 @@ class _HomeContent extends StatelessWidget {
                         return SizedBox(
                           height: 150,
                           child: StoreCard(
-                            store: store,
+                            store: store.copyWith(
+                              isFavorite: favoritesState
+                                  .isFavoriteStore(
+                                store.id,
+                              ),
+                            ),
                             onFavoritePressed: () {
                               context
-                                  .read<HomeCubit>()
+                                  .read<FavoritesCubit>()
                                   .toggleStoreFavorite(
-                                store.id,
+                                store,
                               );
                             },
                             onTap: () {
@@ -311,14 +333,21 @@ class _HomeContent extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final product = state.popularProducts[index];
 
+                        final String heroTag =
+                            'popular-product-image-${product.id}';
+
                         return ProductPreviewCard(
                           width: 172,
                           product: product,
+                          heroTag: heroTag,
                           onTap: () {
                             Navigator.pushNamed(
                               context,
                               ProductDetailsPage.route,
-                              arguments: product,
+                              arguments: {
+                                'product': product,
+                                'heroTag': heroTag,
+                              },
                             );
                           },
                         );
@@ -354,13 +383,20 @@ class _HomeContent extends StatelessWidget {
                             final product =
                             state.recommendedProducts[index];
 
+                            final String heroTag =
+                                'recommended-product-image-${product.id}';
+
                             return ProductPreviewCard(
                               product: product,
+                              heroTag: heroTag,
                               onTap: () {
                                 Navigator.pushNamed(
                                   context,
                                   ProductDetailsPage.route,
-                                  arguments: product,
+                                  arguments: {
+                                    'product': product,
+                                    'heroTag': heroTag,
+                                  },
                                 );
                               },
                             );

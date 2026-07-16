@@ -16,11 +16,17 @@ class PaymentOptions extends StatelessWidget {
 
   final List<CartEntity> cartItems;
   final double totalPrice;
+  final String? deliveryAddress;
+  final double? deliveryLatitude;
+  final double? deliveryLongitude;
 
   const PaymentOptions({
     super.key,
     required this.cartItems,
     required this.totalPrice,
+    this.deliveryAddress,
+    this.deliveryLatitude,
+    this.deliveryLongitude,
   });
 
   static const route = '/paymentOptions';
@@ -57,6 +63,9 @@ class PaymentOptions extends StatelessWidget {
                   cartItems: cartItems,
                   user: user,
                   paymentMethod: PaymentMethod.cash,
+                  deliveryAddress: deliveryAddress,
+                  deliveryLatitude: deliveryLatitude,
+                  deliveryLongitude: deliveryLongitude,
                 );
 
                 if (!context.mounted) return;
@@ -106,6 +115,9 @@ class PaymentOptions extends StatelessWidget {
                     'orderId': DateTime.now().millisecondsSinceEpoch,
                     'amount': (totalPrice * 100).round(),
                     'cartItems': cartItems,
+                    'deliveryAddress': deliveryAddress,
+                    'deliveryLatitude': deliveryLatitude,
+                    'deliveryLongitude': deliveryLongitude,
                   },
                 );
               },

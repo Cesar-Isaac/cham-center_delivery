@@ -10,6 +10,10 @@ class UserEntity extends Equatable {
   final double latitude;
   final double longitude;
 
+  /// خاصان بحساب السائق فقط، ويبقيان null لحساب المستخدم.
+  final String? vehicleType;
+  final String? vehiclePlate;
+
   const UserEntity({
     required this.id,
     required this.fullName,
@@ -19,6 +23,8 @@ class UserEntity extends Equatable {
     required this.address,
     required this.latitude,
     required this.longitude,
+    this.vehicleType,
+    this.vehiclePlate,
   });
 
   UserEntity copyWith({
@@ -30,6 +36,8 @@ class UserEntity extends Equatable {
     String? address,
     double? latitude,
     double? longitude,
+    String? vehicleType,
+    String? vehiclePlate,
   }) {
     return UserEntity(
       id: id ?? this.id,
@@ -40,6 +48,8 @@ class UserEntity extends Equatable {
       address: address ?? this.address,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      vehicleType: vehicleType ?? this.vehicleType,
+      vehiclePlate: vehiclePlate ?? this.vehiclePlate,
     );
   }
 
@@ -53,5 +63,7 @@ class UserEntity extends Equatable {
     address,
     latitude,
     longitude,
+    vehicleType,
+    vehiclePlate,
   ];
 }

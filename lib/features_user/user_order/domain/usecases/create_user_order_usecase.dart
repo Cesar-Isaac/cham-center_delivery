@@ -16,6 +16,9 @@ class CreateUserOrderUseCase {
     required List<CartEntity> cartItems,
     required UserEntity user,
     required PaymentMethod paymentMethod,
+    String? deliveryAddress,
+    double? deliveryLatitude,
+    double? deliveryLongitude,
   }) async {
     if (cartItems.isEmpty) {
       throw Exception('لا يمكن إنشاء طلب من سلة فارغة.');
@@ -25,11 +28,11 @@ class CreateUserOrderUseCase {
 
     final delivery = DeliveryEntity(
       from: LocationConstants.mallName,
-      to: user.address,
+      to: deliveryAddress ?? user.address,
       fromLatitude: LocationConstants.mallLatitude,
       fromLongitude: LocationConstants.mallLongitude,
-      toLatitude: user.latitude,
-      toLongitude: user.longitude,
+      toLatitude: deliveryLatitude ?? user.latitude,
+      toLongitude: deliveryLongitude ?? user.longitude,
     );
 
     final totalPrice = cartItems.fold<double>(

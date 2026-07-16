@@ -10,7 +10,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Tracking Provider',
+      title: 'Cham Center ',
       theme: AppTheme.dark,
       onGenerateRoute: AppRouter.onGenerateRoute,
       initialRoute: '/role',

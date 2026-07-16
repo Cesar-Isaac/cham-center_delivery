@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/style/repo/app_colors.dart';
 import '../../../../core/style/widgets/primary_button.dart';
-import '../../../authentication/presentation/pages/signup_page.dart';
+import '../../../../features-provider/splash/presentation/screens/splash_screen.dart';
+import '../../../splash/presentation/pages/user_splash_screen.dart';
 import '../manager/role_cubit.dart';
 import '../manager/role_state.dart';
 import '../widgets/role_card.dart';
@@ -73,7 +74,7 @@ class RolePage extends StatelessWidget {
 
                   RoleCard(
                     title: "Driver",
-                    subtitle: "Deliver orders (Coming Soon).",
+                    subtitle: "Deliver orders around the city.",
                     icon: Icons.delivery_dining,
                     isSelected:
                     state.selectedRole == UserRole.driver,
@@ -89,18 +90,14 @@ class RolePage extends StatelessWidget {
                         case UserRole.customer:
                           Navigator.pushNamed(
                             context,
-                            SignupPage.route,
+                            UserSplashScreen.route,
                           );
                           break;
 
                         case UserRole.driver:
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "Driver mode is coming soon.",
-                              ),
-                            ),
+                          Navigator.pushNamed(
+                            context,
+                            SplashScreen.route,
                           );
                           break;
 

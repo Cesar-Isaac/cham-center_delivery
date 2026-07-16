@@ -13,8 +13,10 @@ import '../../state/driver_status/driver_status_cubit.dart';
 import '../../state/orders/order_queue_cubit.dart';
 import '../../state/trip/trip_cubit.dart';
 import '../../widgets/order_bottom_sheet.dart';
-import '../../../../history/presentation/screens/history_screen.dart';
 import '../../../../history/presentation/state/history_cubit.dart';
+import '../../../../profile/presentation/screens/driver_profile_page.dart';
+import '../../../../wallet/presentation/screens/wallet_screen.dart';
+import '../../../../wallet/presentation/state/wallet_cubit.dart';
 import '../trip/trip_screen.dart';
 
 class DriverMainScreen extends StatefulWidget {
@@ -38,24 +40,27 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   late final OrderQueueCubit _orderQueueCubit;
   late final DriverStatusCubit _driverStatusCubit;
   late final HistoryCubit _historyCubit;
+  late final WalletCubit _walletCubit;
   late final ConnectivityCubit _connectivityCubit;
 
   @override
   void initState() {
     super.initState();
-    _tripCubit = TripCubit(tripRepo: getIt.trips);
+    // cubits مشتركة مع شاشات الرحلة/السجل/المحفظة عبر getIt،
+    // حتى يستطيع AppRouter توفيرها للمسارات المسماة.
+    _tripCubit = getIt.tripCubit;
+    _historyCubit = getIt.historyCubit;
+    _walletCubit = getIt.walletCubit;
     _orderQueueCubit = OrderQueueCubit(ordersRepo: getIt.orders);
     _driverStatusCubit = DriverStatusCubit();
-    _historyCubit = HistoryCubit(repo: getIt.history);
     _connectivityCubit = ConnectivityCubit();
   }
 
   @override
   void dispose() {
-    _tripCubit.close();
+    // لا نغلق cubits الـ getIt المشتركة — تعيش مع التطبيق.
     _orderQueueCubit.close();
     _driverStatusCubit.close();
-    _historyCubit.close();
     _connectivityCubit.close();
     super.dispose();
   }
@@ -83,27 +88,11 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
   }
 
   void _navigateToTrip(BuildContext ctx) {
-    Navigator.of(ctx).push(
-      MaterialPageRoute<void>(
-        builder: (_) => MultiBlocProvider(
-          providers: [
-            BlocProvider.value(value: _tripCubit),
-          ],
-          child: const TripScreen(),
-        ),
-      ),
-    );
+    Navigator.pushNamed(ctx, TripScreen.route);
   }
 
-  void _navigateToHistory(BuildContext ctx) {
-    Navigator.of(ctx).push(
-      MaterialPageRoute<void>(
-        builder: (_) => BlocProvider.value(
-          value: _historyCubit,
-          child: const HistoryScreen(),
-        ),
-      ),
-    );
+  void _navigateToWallet(BuildContext ctx) {
+    Navigator.pushNamed(ctx, WalletScreen.route);
   }
 
   @override
@@ -175,9 +164,10 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
               setState(() => _driverLocation = tripState.driverLocation ??
                   const Location(lat: AppColors.mallLat, lng: AppColors.mallLng));
 
-              // Record trip in history before resetting.
+              // Record trip in history and earnings before resetting.
               if (tripState.trip != null) {
                 _historyCubit.recordCompletedTrip(tripState.trip!);
+                _walletCubit.recordTripEarnings(tripState.trip!);
               }
 
               _tripCubit.resetTrip();
@@ -190,7 +180,7 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
         ],
         child: _HomeScaffold(
           driverLocation: _driverLocation,
-          onHistoryTap:  _navigateToHistory,
+          onWalletTap: _navigateToWallet,
         ),
       ),
     );
@@ -202,10 +192,10 @@ class _DriverMainScreenState extends State<DriverMainScreen> {
 class _HomeScaffold extends StatelessWidget {
   const _HomeScaffold({
     required this.driverLocation,
-    required this.onHistoryTap,
+    required this.onWalletTap,
   });
   final Location driverLocation;
-  final void Function(BuildContext) onHistoryTap;
+  final void Function(BuildContext) onWalletTap;
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +213,9 @@ class _HomeScaffold extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            child: _TopBar(onHistoryTap: onHistoryTap),
+            child: _TopBar(
+              onWalletTap: onWalletTap,
+            ),
           ),
 
           // ── Offline banner ────────────────────────────────────────────────
@@ -353,8 +345,10 @@ class _DriverMarker extends StatelessWidget {
 // ── Top bar ────────────────────────────────────────────────────────────────────
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.onHistoryTap});
-  final void Function(BuildContext) onHistoryTap;
+  const _TopBar({
+    required this.onWalletTap,
+  });
+  final void Function(BuildContext) onWalletTap;
 
   @override
   Widget build(BuildContext context) {
@@ -375,46 +369,97 @@ class _TopBar extends StatelessWidget {
           ],
         ),
       ),
-      child: Row(
-        children: [
-          // Brand
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF0B1220).withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      // بطاقة زجاجية واحدة تضم كل عناصر الشريط،
+      // الشعار يتمدد بمرونة فلا يحدث overflow مهما ضاقت الشاشة.
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0B1220).withValues(alpha: 0.92),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.35),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.local_shipping_outlined, color: Colors.teal, size: 18),
-                SizedBox(width: 8),
-                Text(
-                  'Tracking Provider',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                  ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Brand mark
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.teal.shade400, Colors.teal.shade800],
                 ),
-              ],
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.teal.withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.local_shipping_outlined,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
-          ),
 
-          const Spacer(),
+            const SizedBox(width: 10),
 
-          // Online/Offline badge
-          const _OnlineStatusBadge(),
+            // Title + live status
+            const Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tracking Provider',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  SizedBox(height: 3),
+                  _OnlineStatusLabel(),
+                ],
+              ),
+            ),
 
-          const SizedBox(width: 8),
+            const SizedBox(width: 8),
 
-          // History button
-          _IconBtn(
-            icon: Icons.history_rounded,
-            onTap: () => onHistoryTap(context),
-          ),
-        ],
+            // Wallet button
+            _IconBtn(
+              icon: Icons.account_balance_wallet_outlined,
+              onTap: () => onWalletTap(context),
+            ),
+
+            const SizedBox(width: 8),
+
+            // Driver profile button
+            _IconBtn(
+              icon: Icons.person_outline_rounded,
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  DriverProfilePage.route,
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -427,61 +472,73 @@ class _IconBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0B1220).withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+    return Material(
+      color: Colors.white.withValues(alpha: 0.06),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+            ),
+          ),
+          child: Icon(icon, color: Colors.white70, size: 20),
         ),
-        child: Icon(icon, color: Colors.white70, size: 20),
       ),
     );
   }
 }
 
-class _OnlineStatusBadge extends StatelessWidget {
-  const _OnlineStatusBadge();
+/// مؤشر الحالة تحت اسم التطبيق: نقطة متوهجة + نص ملوّن.
+class _OnlineStatusLabel extends StatelessWidget {
+  const _OnlineStatusLabel();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DriverStatusCubit, DriverStatus>(
       builder: (_, status) {
         final online = status == DriverStatus.online;
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0B1220).withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: (online ? Colors.green : Colors.red)
-                  .withValues(alpha: 0.5),
+        final color = online ? Colors.greenAccent : Colors.redAccent;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 7,
+              height: 7,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.6),
+                    blurRadius: 6,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
             ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: online ? Colors.green : Colors.red,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                online ? 'Online' : 'Offline',
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                online
+                    ? 'Online — Receiving orders'
+                    : 'Offline',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: online ? Colors.green : Colors.red,
-                  fontSize: 12,
+                  color: color,
+                  fontSize: 11,
                   fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );

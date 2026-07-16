@@ -11,11 +11,16 @@ class ProductPreviewCard extends StatelessWidget {
     required this.product,
     this.width,
     this.onTap,
+    this.heroTag,
   });
 
   final ProductEntity product;
   final double? width;
   final VoidCallback? onTap;
+
+  /// وسم فريد لكل قسم حتى لا تتكرر وسوم Hero
+  /// عندما يظهر نفس المنتج في أكثر من مكان.
+  final String? heroTag;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +49,8 @@ class ProductPreviewCard extends StatelessWidget {
                     fit: StackFit.expand,
                     children: [
                       Hero(
-                        tag: 'product-image-${product.id}',
+                        tag: heroTag ??
+                            'product-image-${product.id}',
                         child: CachedNetworkImage(
                           imageUrl: product.image,
                           fit: BoxFit.cover,

@@ -79,23 +79,6 @@ class ProductCubit extends Cubit<ProductState> {
     );
   }
 
-  void toggleFavorite(int productId) {
-    final List<int> updatedIds =
-    List<int>.from(state.favoriteIds);
-
-    if (updatedIds.contains(productId)) {
-      updatedIds.remove(productId);
-    } else {
-      updatedIds.add(productId);
-    }
-
-    emit(
-      state.copyWith(
-        favoriteIds: updatedIds,
-      ),
-    );
-  }
-
   List<ProductEntity> _filterProducts({
     required List<ProductEntity> products,
     required String query,

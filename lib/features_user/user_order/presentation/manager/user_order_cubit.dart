@@ -76,6 +76,9 @@ class UserOrderCubit extends Cubit<UserOrderState> {
     required List<CartEntity> cartItems,
     required UserEntity user,
     required PaymentMethod paymentMethod,
+    String? deliveryAddress,
+    double? deliveryLatitude,
+    double? deliveryLongitude,
   }) async {
     if (cartItems.isEmpty) {
       emit(
@@ -101,6 +104,9 @@ class UserOrderCubit extends Cubit<UserOrderState> {
         cartItems: cartItems,
         user: user,
         paymentMethod: paymentMethod,
+        deliveryAddress: deliveryAddress,
+        deliveryLatitude: deliveryLatitude,
+        deliveryLongitude: deliveryLongitude,
       );
 
       await clearCartUseCase();

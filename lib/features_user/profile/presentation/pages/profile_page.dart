@@ -7,6 +7,7 @@ import '../../../../core/style/widgets/primary_button.dart';
 import '../../../authentication/presentation/manager/auth_cubit.dart';
 import '../../../authentication/presentation/manager/auth_state.dart';
 import '../../../authentication/presentation/pages/login_page.dart';
+import 'edit_profile_page.dart';
 
 class ProfilePage extends StatelessWidget {
   static const String route = '/profile';
@@ -126,13 +127,9 @@ class ProfilePage extends StatelessWidget {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Profile editing will be added later.',
-                          ),
-                        ),
+                      Navigator.pushNamed(
+                        context,
+                        EditProfilePage.route,
                       );
                     },
                     icon: const Icon(

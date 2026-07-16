@@ -79,30 +79,6 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
-  void toggleStoreFavorite(int storeId) {
-    final List<StoreEntity> updatedStores =
-    state.allStores.map((store) {
-      if (store.id != storeId) {
-        return store;
-      }
-
-      return store.copyWith(
-        isFavorite: !store.isFavorite,
-      );
-    }).toList();
-
-    emit(
-      state.copyWith(
-        allStores: updatedStores,
-        filteredStores: _filterStores(
-          stores: updatedStores,
-          category: state.selectedCategory,
-          query: state.searchQuery,
-        ),
-      ),
-    );
-  }
-
   List<StoreEntity> _filterStores({
     required List<StoreEntity> stores,
     required String category,

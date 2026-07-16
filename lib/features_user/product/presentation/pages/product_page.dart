@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/style/repo/app_colors.dart';
 import '../../../../core/style/style/app_theme.dart';
+import '../../../favorites/presentation/manager/favorites_cubit.dart';
+import '../../../favorites/presentation/manager/favorites_state.dart';
 import '../../../home/domain/entities/store_entity.dart';
 import '../manager/product_cubit.dart';
 import '../manager/product_state.dart';
@@ -49,14 +51,30 @@ class _ProductPageState extends State<ProductPage> {
   Widget build(BuildContext context) {
     return BlocBuilder<ProductCubit, ProductState>(
       builder: (context, state) {
+        final bool isStoreFavorite = context
+            .watch<FavoritesCubit>()
+            .state
+            .isFavoriteStore(widget.store.id);
+
         return Scaffold(
           appBar: AppBar(
             title: Text(widget.store.name),
             actions: [
               IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.favorite_border_rounded,
+                onPressed: () {
+                  context
+                      .read<FavoritesCubit>()
+                      .toggleStoreFavorite(
+                    widget.store,
+                  );
+                },
+                icon: Icon(
+                  isStoreFavorite
+                      ? Icons.favorite_rounded
+                      : Icons.favorite_border_rounded,
+                  color: isStoreFavorite
+                      ? AppColors.primary
+                      : null,
                 ),
               ),
             ],
@@ -303,28 +321,35 @@ class _ProductPageState extends State<ProductPage> {
                     state.filteredProducts[
                     index];
 
-                    return ProductCard(
-                      product: product,
-                      rating:
-                      state.ratingFor(
-                        product.id,
-                      ),
-                      isFavorite:
-                      state.isFavorite(
-                        product.id,
-                      ),
-                      onFavoritePressed: () {
-                        context
-                            .read<ProductCubit>()
-                            .toggleFavorite(
-                          product.id,
-                        );
-                      },
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          ProductDetailsPage.route,
-                          arguments: product,
+                    return BlocBuilder<
+                        FavoritesCubit,
+                        FavoritesState>(
+                      builder:
+                          (context, favoritesState) {
+                        return ProductCard(
+                          product: product,
+                          rating:
+                          state.ratingFor(
+                            product.id,
+                          ),
+                          isFavorite:
+                          favoritesState.isFavorite(
+                            product.id,
+                          ),
+                          onFavoritePressed: () {
+                            context
+                                .read<FavoritesCubit>()
+                                .toggleFavorite(
+                              product,
+                            );
+                          },
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              ProductDetailsPage.route,
+                              arguments: product,
+                            );
+                          },
                         );
                       },
                     );

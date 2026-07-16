@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tracking_provider/core/style/repo/app_colors.dart';
 
-import '../../../../core/style/widgets/custom_bottom.dart';
-import '../../../payment/presentation/pages/Payment_options.dart';
+import '../../../user_order/presentation/pages/delivery_location_page.dart';
 import '../manager/cart_cubit.dart';
 import '../manager/cart_state.dart';
 import '../widgets/cart_card.dart';
@@ -160,7 +159,7 @@ class Cart extends StatelessWidget {
                           : () {
                         Navigator.pushNamed(
                           context,
-                          PaymentOptions.route,
+                          DeliveryLocationPage.route,
                           arguments: {
                             'cartItems': state.items,
                             'totalPrice':

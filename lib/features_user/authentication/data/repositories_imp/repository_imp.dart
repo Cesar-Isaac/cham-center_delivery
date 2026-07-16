@@ -9,7 +9,53 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> signup(UserEntity user) async {
+    // حماية أخيرة: لا يُنشأ حساب ببريد أو هاتف مستخدمين من قبل.
+    final bool emailTaken = isEmailTaken(user.email);
+    final bool phoneTaken = isPhoneTaken(user.phone);
+
+    if (emailTaken && phoneTaken) {
+      throw Exception(
+        'البريد الإلكتروني ورقم الهاتف مستخدمان من قبل.',
+      );
+    }
+
+    if (emailTaken) {
+      throw Exception(
+        'البريد الإلكتروني مستخدم من قبل.',
+      );
+    }
+
+    if (phoneTaken) {
+      throw Exception(
+        'رقم الهاتف مستخدم من قبل.',
+      );
+    }
+
     await localDataSource.saveUser(user);
+  }
+
+  @override
+  bool isEmailTaken(String email) {
+    final UserEntity? existing = localDataSource.getUser();
+
+    if (existing == null) return false;
+
+    return existing.email.trim().toLowerCase() ==
+        email.trim().toLowerCase();
+  }
+
+  @override
+  bool isPhoneTaken(String phone) {
+    final UserEntity? existing = localDataSource.getUser();
+
+    if (existing == null) return false;
+
+    return _normalizePhone(existing.phone) ==
+        _normalizePhone(phone);
+  }
+
+  String _normalizePhone(String phone) {
+    return phone.replaceAll(RegExp(r'[\s\-()]'), '');
   }
 
   @override
@@ -44,6 +90,11 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     return localDataSource.getUser();
+  }
+
+  @override
+  Future<void> updateUser(UserEntity user) async {
+    await localDataSource.updateUser(user);
   }
 
   @override

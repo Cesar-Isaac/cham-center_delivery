@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/style/repo/app_colors.dart';
-import '../../../driver/presentation/screens/main/driver_main_screen.dart';
+import '../../../auth/presentation/screens/driver_signup_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -107,13 +107,10 @@ class _SplashScreenState extends State<SplashScreen>
     await _textCtrl.forward();
     await Future.delayed(const Duration(milliseconds: 1800));
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder<void>(
-        pageBuilder: (_, __, ___) => const DriverMainScreen(),
-        transitionDuration: const Duration(milliseconds: 500),
-        transitionsBuilder: (_, anim, __, child) =>
-            FadeTransition(opacity: anim, child: child),
-      ),
+    // إنشاء حساب السائق / تسجيل الدخول قبل الوصول إلى شاشته الرئيسية.
+    Navigator.pushReplacementNamed(
+      context,
+      DriverSignupPage.route,
     );
   }
 

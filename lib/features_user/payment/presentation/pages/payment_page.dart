@@ -15,12 +15,18 @@ class PaymentPage extends StatefulWidget {
   final int orderId;
   final int amount;
   final List<CartEntity> cartItems;
+  final String? deliveryAddress;
+  final double? deliveryLatitude;
+  final double? deliveryLongitude;
 
   const PaymentPage({
     super.key,
     required this.orderId,
     required this.amount,
     required this.cartItems,
+    this.deliveryAddress,
+    this.deliveryLatitude,
+    this.deliveryLongitude,
   });
 
   static const String route = '/payment';
@@ -102,6 +108,9 @@ class _PaymentPageState extends State<PaymentPage> {
       cartItems: widget.cartItems,
       user: user,
       paymentMethod: PaymentMethod.electronic,
+      deliveryAddress: widget.deliveryAddress,
+      deliveryLatitude: widget.deliveryLatitude,
+      deliveryLongitude: widget.deliveryLongitude,
     );
 
     if (!mounted) return;

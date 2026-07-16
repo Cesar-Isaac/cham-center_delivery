@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/style/widgets/primary_button.dart';
 
 
 import '../../../../core/validation/validator.dart';
+import '../manager/auth_cubit.dart';
 import '../widgets/auth_footer.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_text_field.dart';
@@ -171,6 +173,36 @@ class _SignupPageState extends State<SignupPage> {
 
                     if (!formKey.currentState!
                         .validate()) {
+                      return;
+                    }
+
+                    // منع استخدام بريد أو هاتف لحساب مسجّل سابقاً.
+                    final String? availabilityError =
+                    context
+                        .read<AuthCubit>()
+                        .checkAccountAvailability(
+                      email: emailController.text
+                          .trim(),
+                      phone: phoneController.text
+                          .trim(),
+                    );
+
+                    if (availabilityError != null) {
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              availabilityError,
+                            ),
+                            backgroundColor:
+                            Colors.red,
+                            behavior:
+                            SnackBarBehavior
+                                .floating,
+                          ),
+                        );
+
                       return;
                     }
 

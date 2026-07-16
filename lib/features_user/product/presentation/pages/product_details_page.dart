@@ -6,6 +6,8 @@ import '../../../../core/style/repo/app_colors.dart';
 import '../../../../core/style/style/app_theme.dart';
 import '../../../../core/style/widgets/primary_button.dart';
 import '../../../cart/presentation/manager/cart_cubit.dart';
+import '../../../favorites/presentation/manager/favorites_cubit.dart';
+import '../../../favorites/presentation/manager/favorites_state.dart';
 import '../../domain/entities/product_entity.dart';
 import '../manager/product_cubit.dart';
 import '../manager/product_state.dart';
@@ -16,16 +18,24 @@ class ProductDetailsPage extends StatelessWidget {
   const ProductDetailsPage({
     super.key,
     required this.product,
+    this.heroTag,
   });
 
   final ProductEntity product;
+
+  /// يطابق وسم البطاقة التي فتحت الصفحة
+  /// حتى تعمل حركة Hero من أي قسم.
+  final String? heroTag;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProductCubit, ProductState>(
       builder: (context, state) {
+        final FavoritesState favoritesState =
+        context.watch<FavoritesCubit>().state;
+
         final bool isFavorite =
-        state.isFavorite(product.id);
+        favoritesState.isFavorite(product.id);
 
         final double rating =
         state.ratingFor(product.id);
@@ -53,9 +63,9 @@ class ProductDetailsPage extends StatelessWidget {
                     child: IconButton(
                       onPressed: () {
                         context
-                            .read<ProductCubit>()
+                            .read<FavoritesCubit>()
                             .toggleFavorite(
-                          product.id,
+                          product,
                         );
                       },
                       icon: Icon(
@@ -73,8 +83,8 @@ class ProductDetailsPage extends StatelessWidget {
                 flexibleSpace:
                 FlexibleSpaceBar(
                   background: Hero(
-                    tag:
-                    'product-image-${product.id}',
+                    tag: heroTag ??
+                        'product-image-${product.id}',
                     child: CachedNetworkImage(
                       imageUrl: product.image,
                       fit: BoxFit.cover,
